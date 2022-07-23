@@ -1,0 +1,17 @@
+services:
+  ticket-monitor:
+    build: .
+    env_file:
+      - .docker.env
+
+  mongo:
+    image: mongo:latest
+    env_file:
+      - .mongo.docker.env
+    ports:
+      - '27017-27019:27017-27019'
+    volumes:
+      - ./db:/data/db
+
+volumes:
+  db:
