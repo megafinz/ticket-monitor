@@ -31,7 +31,7 @@ while (true) {
             await requestLogger.error(`Can't parse the DOM`);
           } else {
             if (search.find(dom.body, request.searchCriteria)) {
-              await requestLogger.important(`Tickets are available for '${request.description}'}!`);
+              await requestLogger.important(`Tickets are available for '${request.description}'! Link: ${request.pageUrl}.`);
               await mainLogger.info(`Removing request '${request.description}' from database…`)
               await db.remove(request);
             } else {
