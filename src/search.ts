@@ -1,4 +1,4 @@
-import { HTMLCollection, Element } from './deps.ts';
+import { HTMLCollection, Element } from './deps/html.ts';
 import { SearchCriteria } from "./model.ts";
 
 export function find(container: Element, criteria: SearchCriteria): boolean {

@@ -4,8 +4,8 @@ WORKDIR /app
 
 USER deno
 
-COPY src/deps.ts .
-RUN deno cache deps.ts
+COPY src/deps/ deps/
+RUN deno cache deps/all.ts
 
 ADD /src .
 RUN deno cache main.ts

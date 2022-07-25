@@ -1,4 +1,4 @@
-import { config } from './deps.ts';
+import { config } from './deps/config.ts';
 
 config({ export: true });
 
