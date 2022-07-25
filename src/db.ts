@@ -1,17 +1,23 @@
 import config from './config.ts';
-import { TicketMonitoringRequest } from './model.ts';
-import { createDb } from './db/db.mongodb.ts';
-import { AsyncLogger } from "./log.ts";
+import { SearchCriteriaPreset, TicketMonitoringRequest } from './model.ts';
+import { AsyncLogger } from './log.ts';
+import { createDb } from './db/mongodb/db.ts';
+import { createMigrator } from './db/mongodb/db.migrator.ts';
 
 export interface Db {
-  getAll(): Promise<TicketMonitoringRequest[]>;
-  add(request: TicketMonitoringRequest): Promise<void>;
-  remove(request: TicketMonitoringRequest): Promise<void>;
+  getRequests(): Promise<TicketMonitoringRequest[]>;
+  addRequest(request: TicketMonitoringRequest): Promise<void>;
+  removeRequest(request: TicketMonitoringRequest): Promise<void>;
+  getPresets(): Promise<SearchCriteriaPreset[]>;
+}
+
+export interface Migrator {
+  runMigrations(): Promise<void>;
 }
 
 export class DbError extends Error {
   constructor(msg: string) {
-    super(msg);
+    super(`[DbError]: ${msg}`);
     Object.setPrototypeOf(this, DbError.prototype);
   }
 }
@@ -19,27 +25,35 @@ export class DbError extends Error {
 class ErrorWrappingDb implements Db {
   constructor(private db: Db) { }
 
-  getAll(): Promise<TicketMonitoringRequest[]> {
+  async getRequests(): Promise<TicketMonitoringRequest[]> {
     try {
-      return this.db.getAll();
+      return await this.db.getRequests();
     } catch (e) {
-      throw new DbError(`[DbError]: ${e}`);
+      throw new DbError(`${e}`);
     }
   }
 
-  add(request: TicketMonitoringRequest): Promise<void> {
+  async addRequest(request: TicketMonitoringRequest): Promise<void> {
     try {
-      return this.db.add(request);
+      return await this.db.addRequest(request);
     } catch (e) {
-      throw new DbError(`[DbError]: ${e}`);
+      throw new DbError(`${e}`);
     }
   }
 
-  remove(request: TicketMonitoringRequest): Promise<void> {
+  async removeRequest(request: TicketMonitoringRequest): Promise<void> {
     try {
-      return this.db.remove(request);
+      return await this.db.removeRequest(request);
     } catch (e) {
-      throw new DbError(`[DbError]: ${e}`);
+      throw new DbError(`${e}`);
+    }
+  }
+
+  async getPresets(): Promise<SearchCriteriaPreset[]> {
+    try {
+      return await this.db.getPresets();
+    } catch (e) {
+      throw new DbError(`${e}`);
     }
   }
 }
@@ -47,13 +61,27 @@ class ErrorWrappingDb implements Db {
 let db: Promise<Db>;
 
 export function initDb(logger: AsyncLogger): Promise<Db> {
+  logger.info('Initializing database…');
+
   if (db) {
+    logger.info('Database is already initialized');
     return db;
   }
 
   if (config.db.type === 'mongodb') {
+    logger.info('Initializing MongoDB client…');
     db = createDb(logger, config.db.connectionString).then(x => new ErrorWrappingDb(x));
+  } else {
+    throw new Error(`Unsupported DB type: ${config.db.type}`);
   }
 
   return db;
+}
+
+export async function initMigrator(logger: AsyncLogger): Promise<Migrator> {
+  if (config.db.type === 'mongodb') {
+    return await createMigrator(logger, config.db.connectionString, config.db.migrationsFolderPath);
+  }
+
+  throw new Error(`Unsupported DB type: ${config.db.type}`);
 }

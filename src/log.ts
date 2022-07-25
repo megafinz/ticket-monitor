@@ -8,23 +8,25 @@ export interface AsyncLogger {
 }
 
 export class ConsoleLogger implements AsyncLogger {
+  constructor(private name: string) { }
+
   info(message: string) {
-    console.log(new Date(), message);
+    console.log(new Date(), `[${this.name}]`, message);
     return Promise.resolve();
   }
 
   warn(message: string) {
-    console.warn(new Date(), message);
+    console.warn(new Date(), `[${this.name}]`, message);
     return Promise.resolve();
   }
 
   error(message: string) {
-    console.error(new Date(), message);
+    console.error(new Date(), `[${this.name}]`, message);
     return Promise.resolve();
   }
 
   important(message: string) {
-    console.info(new Date(), message);
+    console.info(new Date(), `[${this.name}]`, message);
     return Promise.resolve();
   }
 }

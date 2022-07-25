@@ -1,26 +1,29 @@
 import { delay } from './deps/utils.ts';
 import { DOMParser } from './deps/html.ts';
-import * as log from './log.ts';
+import { AsyncLogger } from './log.ts';
 import { initDb } from './db.ts';
 import * as search from './search.ts';
 import config from './config.ts';
-import { Report } from "./model.ts";
+import { ReportSettings } from './model.ts';
 
 const domParser = new DOMParser();
-const mainLogger = new log.ConsoleLogger();
-const db = await initDb(mainLogger);
 
-export async function run() {
+export async function run(
+  mainLogger: AsyncLogger,
+  monitoringRequestLoggerFactory: (report: ReportSettings) => AsyncLogger
+) {
+  await mainLogger.info('Starting worker…');
+  const db = await initDb(mainLogger);
   while (true) {
     try {
       await mainLogger.info('Retrieving ticket monitoring requests from database…');
-      const requests = await db.getAll();
+      const requests = await db.getRequests();
       if (requests.length > 0) {
         await mainLogger.info(`Processing ${requests.length} ticket monitoring request(s)…`);
         for (const request of requests) {
-          const requestLogger = getLogger(request.report);
+          const requestLogger = monitoringRequestLoggerFactory(request.report);
           await requestLogger.info('--------------------------------------------');
-          await requestLogger.info(`Processing request '${request.description}'…`);
+          await requestLogger.info(`Processing request '${request.title}'…`);
           await requestLogger.info(`Requesting '${request.pageUrl}'…`);
           const response = await fetch(request.pageUrl);
           if (response.status !== 200) {
@@ -33,15 +36,15 @@ export async function run() {
               await requestLogger.error(`Can't parse the DOM`);
             } else {
               if (search.find(dom.body, request.searchCriteria)) {
-                await requestLogger.important(`Tickets are available for '${request.description}'! Link: ${request.pageUrl}.`);
-                await mainLogger.info(`Removing request '${request.description}' from database…`)
-                await db.remove(request);
+                await requestLogger.important(`Tickets are available for '${request.title}'! Link: ${request.pageUrl}.`);
+                await mainLogger.info(`Removing request '${request.title}' from database…`)
+                await db.removeRequest(request);
               } else {
                 await requestLogger.info('Tickets not found');
                 if (request.expirationDate.valueOf() < Date.now()) {
-                  await requestLogger.info(`Ticket monitoring request '${request.description}' has expired`);
-                  await mainLogger.info(`Removing request '${request.description}' from database…`);
-                  await db.remove(request);
+                  await requestLogger.info(`Ticket monitoring request '${request.title}' has expired`);
+                  await mainLogger.info(`Removing request '${request.title}' from database…`);
+                  await db.removeRequest(request);
                 }
               }
             }
@@ -58,11 +61,4 @@ export async function run() {
       await delay(config.retryIntervalMs);
     }
   }
-}
-
-function getLogger(report: Report) {
-  return new log.CompositeLogger([
-    new log.ConsoleLogger(),
-    new log.TgLogger(report.chatId)
-  ]);
 }

@@ -8,15 +8,20 @@ export type SearchCriteria = {
   child?: SearchCriteria
 }
 
-export type Report = {
+export type ReportSettings = {
   type: 'telegram',
   chatId: string
 }
 
 export interface TicketMonitoringRequest {
-  description: string,
+  title: string,
   pageUrl: string,
   searchCriteria: SearchCriteria,
   expirationDate: Date,
-  report: Report
+  report: ReportSettings
+}
+
+export interface SearchCriteriaPreset {
+  title: string,
+  searchCriteria: SearchCriteria
 }

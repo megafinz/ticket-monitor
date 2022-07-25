@@ -1,15 +1,19 @@
 services:
   ticket-monitor:
     build: .
-    env_file:
-      - .docker.env
+    ports:
+    - '${API_PORT}:${API_PORT}'
+    environment:
+      - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
+      - RETRY_INTERVAL_MS=${RETRY_INTERVAL_MS}
+      - TG_BOT_TOKEN=${TG_BOT_TOKEN}
+      - API_KEY=${API_KEY}
+      - API_PORT=${API_PORT}
 
   mongo:
     image: mongo:latest
-    env_file:
-      - .mongo.docker.env
     ports:
-      - '27017-27019:27017-27019'
+      - '27017:27017'
     volumes:
       - ./db:/data/db
 
