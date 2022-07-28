@@ -33,7 +33,7 @@ const cfg : Config = {
   },
   api: {
     key: Deno.env.get('API_KEY') || '',
-    port: parseInt(Deno.env.get('API_PORT') || '80')
+    port: parseInt(Deno.env.get('PORT') || '80')
   }
 };
 
