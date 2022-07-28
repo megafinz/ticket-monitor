@@ -9,7 +9,7 @@ services:
     depends_on:
       - migrator # TODO: wait for migrator to finish
     build:
-      dockerfile: Dockerfile.api
+      dockerfile: Dockerfile.web
     ports:
     - '${PORT}:${PORT}'
     environment:
