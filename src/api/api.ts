@@ -4,7 +4,7 @@ import type { AsyncLogger } from '../shared/log.ts';
 import auth from './middleware/auth.ts';
 import v1Router from './routes/v1/routes.ts';
 
-export async function run(logger: AsyncLogger) {
+export async function run(logger: AsyncLogger, abortSignal: AbortSignal) {
   const app = new Application();
   const router = new Router().use('/api/v1', v1Router.routes(), v1Router.allowedMethods());
 
@@ -16,7 +16,8 @@ export async function run(logger: AsyncLogger) {
 
   try {
     await app.listen({
-      port: config.api.port
+      port: config.api.port,
+      signal: abortSignal
     });
   } catch (e) {
     logger.error(`There was a problem starting API server: ${e}`);

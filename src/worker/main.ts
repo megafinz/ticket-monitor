@@ -2,7 +2,13 @@ import { ReportSettings } from '../shared/model.ts';
 import * as log from '../shared/log.ts';
 import * as worker from './worker.ts';
 
-const workerLogger = new log.ConsoleLogger('Worker');
+const logger = new log.ConsoleLogger('Worker');
+const abortController = new AbortController();
+
+Deno.addSignalListener('SIGTERM', () => {
+  logger.info('Received SIGTERM signal, stopping the worker…');
+  abortController.abort();
+});
 
 function createTicketMonitorRequestLogger(report: ReportSettings | undefined): log.AsyncLogger {
   return report
@@ -13,4 +19,5 @@ function createTicketMonitorRequestLogger(report: ReportSettings | undefined): l
     : new log.ConsoleLogger('Worker -> Ticket Monitor');
 }
 
-await worker.run(workerLogger, createTicketMonitorRequestLogger);
+await worker.run(logger, createTicketMonitorRequestLogger, abortController.signal);
+await logger.info('Worker finished running');

@@ -9,12 +9,13 @@ type RequestLoggerFactory = (report: ReportSettings | undefined) => AsyncLogger;
 
 export async function run(
   mainLogger: AsyncLogger,
-  requestLoggerFactory: RequestLoggerFactory
+  requestLoggerFactory: RequestLoggerFactory,
+  abortSignal: AbortSignal
 ) {
   await mainLogger.info('Starting worker…');
   const db = await initDb(mainLogger);
 
-  while (true) {
+  while (!abortSignal.aborted) {
     try {
       await mainLogger.info('Retrieving ticket monitoring requests from database…');
       const requests = await db.getRequests();
