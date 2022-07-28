@@ -11,4 +11,4 @@ ADD src/shared/ shared/
 ADD src/worker/ worker/
 RUN deno cache worker/main.ts
 
-CMD [ "run", "--allow-net", "--allow-env", "--allow-run", "--allow-read", "worker/main.ts" ]
+CMD [ "deno", "run", "--allow-net", "--allow-env", "--allow-run", "--allow-read", "worker/main.ts" ]

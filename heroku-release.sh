@@ -1,3 +1,11 @@
 #!/bin/bash
-heroku container:push migrator api worker --recursive -a $APP_NAME
-heroku container:release migrator api worker -a $APP_NAME
+echo "------------ PUSH -------------"
+docker tag ticket-monitor-migrator registry.heroku.com/$APP_NAME/release
+docker tag ticket-monitor-api registry.heroku.com/$APP_NAME/web
+docker tag ticket-monitor-worker registry.heroku.com/$APP_NAME/worker
+docker push registry.heroku.com/$APP_NAME/release
+docker push registry.heroku.com/$APP_NAME/web
+docker push registry.heroku.com/$APP_NAME/worker
+
+echo "----------- RELEASE -----------"
+heroku container:release release web worker --app $APP_NAME

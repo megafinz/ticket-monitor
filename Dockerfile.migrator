@@ -12,4 +12,4 @@ ADD /src/shared/ shared/
 ADD /src/migrator/ migrator
 RUN deno cache migrator/main.ts
 
-CMD [ "run", "--allow-net", "--allow-env", "--allow-run", "--allow-read", "migrator/main.ts" ]
+CMD [ "deno", "run", "--allow-net", "--allow-env", "--allow-run", "--allow-read", "migrator/main.ts" ]

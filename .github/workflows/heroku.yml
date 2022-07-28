@@ -15,6 +15,6 @@ jobs:
         justlogin: true
     - run: |
         heroku container:login && \
-        heroku container:push migrator web worker --recursive --app ${{ secrets.HEROKU_APP_NAME }} && \
-        heroku container:release migrator web worker --app ${{ secrets.HEROKU_APP_NAME }}
+        ./docker-build.sh && \
+        ./heroku-release.sh
 
