@@ -1,5 +1,5 @@
-import type { MongoClient, ObjectId } from '../../src/deps/db.ts';
-import type { SearchCriteriaPreset } from '../../src/model.ts';
+import type { MongoClient, ObjectId } from '../../src/shared/deps/db.ts';
+import type { SearchCriteriaPreset } from '../../src/shared/model.ts';
 
 type SearchCriteriaPresetSchema = {
   _id: ObjectId

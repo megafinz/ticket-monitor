@@ -1,4 +1,16 @@
-import { either, InputData, isDate, isIn, isString, minLength, required, Rule, validate, validateObject, ValidationRules } from '../deps/validation.ts';
+import {
+  type InputData,
+  type Rule,
+  type ValidationRules,
+  either,
+  isDate,
+  isIn,
+  isString,
+  minLength,
+  required,
+  validate,
+  validateObject
+} from '../shared/deps/validation.ts';
 
 function validateSearchCriteria(searchCriteriaJson: InputData): Rule[] {
   return [

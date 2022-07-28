@@ -1,14 +1,14 @@
 export {
-  either,
   type InputData,
+  type Rule,
+  type ValidationRules,
+  either,
   invalid,
   isDate,
   isIn,
   isString,
   minLength,
   required,
-  type Rule,
   validate,
-  validateObject,
-  type ValidationRules
+  validateObject
 } from 'https://deno.land/x/validasaur@v0.15.0/mod.ts';

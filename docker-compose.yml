@@ -1,14 +1,31 @@
 services:
-  ticket-monitor:
-    build: .
+  migrator:
+    build:
+      dockerfile: Dockerfile.migrator
+    environment:
+      - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
+
+  api:
+    depends_on:
+      - migrator # TODO: wait for migrator to finish
+    build:
+      dockerfile: Dockerfile.api
     ports:
     - '${PORT}:${PORT}'
     environment:
       - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
-      - RETRY_INTERVAL_MS=${RETRY_INTERVAL_MS}
-      - TG_BOT_TOKEN=${TG_BOT_TOKEN}
       - API_KEY=${API_KEY}
       - PORT=${PORT}
+
+  worker:
+    depends_on:
+      - migrator # TODO: wait for migrator to finish
+    build:
+      dockerfile: Dockerfile.worker
+    environment:
+      - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
+      - RETRY_INTERVAL_MS=${RETRY_INTERVAL_MS}
+      - TG_BOT_TOKEN=${TG_BOT_TOKEN}
 
   mongo:
     image: mongo:latest

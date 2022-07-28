@@ -1,0 +1,15 @@
+FROM denoland/deno:1.24.0
+
+WORKDIR /app
+
+USER deno
+
+COPY /src/shared/deps/ shared/deps/
+RUN deno cache shared/deps/all.ts
+
+ADD /migrations/ migrations/
+ADD /src/shared/ shared/
+ADD /src/migrator/ migrator
+RUN deno cache migrator/main.ts
+
+CMD [ "run", "--allow-net", "--allow-env", "--allow-run", "--allow-read", "migrator/main.ts" ]

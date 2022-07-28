@@ -1,7 +1,7 @@
-import { Router } from '../../../deps/api.ts';
-import { initDb } from '../../../db.ts';
-import * as executor from '../../../executor.ts';
-import * as log from '../../../log.ts';
+import { Router } from '../../../shared/deps/api.ts';
+import { initDb } from '../../../shared/db.ts';
+import * as executor from '../../../shared/executor.ts';
+import * as log from '../../../shared/log.ts';
 import validateTicketMonitoringRequestMiddleware from '../../middleware/validate-ticket-monitoring-request.ts';
 
 const routesLogger = new log.ConsoleLogger('API -> Routes');

@@ -1,8 +1,8 @@
 import { delay, formatDate, parseDate } from '../../deps/utils.ts';
-import { Collection, MongoClient, MongoDriverError, ObjectId } from '../../deps/db.ts';
-import { Db, DbError } from '../../db.ts';
+import { type Collection, type ObjectId, MongoClient, MongoDriverError } from '../../deps/db.ts';
+import { type Db, DbError } from '../../db.ts';
 import type { SearchCriteriaPreset, TicketMonitoringRequest } from '../../model.ts';
-import { AsyncLogger } from '../../log.ts';
+import type { AsyncLogger } from '../../log.ts';
 
 type TicketMonitoringRequestSchema = {
   _id: ObjectId;

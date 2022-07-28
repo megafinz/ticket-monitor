@@ -1,7 +1,8 @@
-import { MongoClient, MongoDriverError, ObjectId } from '../../deps/db.ts';
-import { delay, joinPath } from '../../deps/utils.ts';
-import { DbError, Migrator } from '../../db.ts';
-import { AsyncLogger } from '../../log.ts';
+import { type ObjectId, MongoClient, MongoDriverError } from '../../shared/deps/db.ts';
+import { delay, joinPath } from '../../shared/deps/utils.ts';
+import { DbError } from '../../shared/db.ts';
+import type { AsyncLogger } from '../../shared/log.ts';
+import { Migrator } from '../migrator.ts';
 
 interface MigrationSchema {
   _id: ObjectId;

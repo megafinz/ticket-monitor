@@ -1,16 +1,19 @@
-import { delay } from './deps/utils.ts';
-import type { AsyncLogger } from './log.ts';
-import { initDb } from './db.ts';
-import * as executor from './executor.ts';
-import config from './config.ts';
-import type { ReportSettings } from './model.ts';
+import { delay } from '../shared/deps/utils.ts';
+import type { ReportSettings } from '../shared/model.ts';
+import { initDb } from '../shared/db.ts';
+import * as executor from '../shared/executor.ts';
+import type { AsyncLogger } from '../shared/log.ts';
+import config from '../shared/config.ts';
+
+type RequestLoggerFactory = (report: ReportSettings | undefined) => AsyncLogger;
 
 export async function run(
   mainLogger: AsyncLogger,
-  monitoringRequestLoggerFactory: (report: ReportSettings | undefined) => AsyncLogger
+  requestLoggerFactory: RequestLoggerFactory
 ) {
   await mainLogger.info('Starting worker…');
   const db = await initDb(mainLogger);
+
   while (true) {
     try {
       await mainLogger.info('Retrieving ticket monitoring requests from database…');
@@ -18,7 +21,7 @@ export async function run(
       if (requests.length > 0) {
         await mainLogger.info(`Processing ${requests.length} ticket monitoring request(s)…`);
         for (const request of requests) {
-          const requestLogger = monitoringRequestLoggerFactory(request.report);
+          const requestLogger = requestLoggerFactory(request.report);
           await requestLogger.info('--------------------------------------------');
           await requestLogger.info(`Processing request '${request.title}' with URL '${request.pageUrl}'…`);
           const result = await executor.executeRequest(request);

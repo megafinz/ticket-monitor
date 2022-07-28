@@ -1,6 +1,6 @@
-import { Middleware, Status } from '../../deps/api.ts';
-import { parseDate } from '../../deps/utils.ts';
-import type { TicketMonitoringRequest, TicketMonitoringRequestDto } from '../../model.ts';
+import { type Middleware, Status } from '../../shared/deps/api.ts';
+import { parseDate } from '../../shared/deps/utils.ts';
+import type { TicketMonitoringRequest, TicketMonitoringRequestDto } from '../../shared/model.ts';
 import { validateTicketMonitoringRequest } from '../validation.ts';
 
 const validateTicketMonitoringRequestMiddleware: Middleware = async (ctx, next) => {

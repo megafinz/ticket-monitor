@@ -1,5 +1,5 @@
-import { Middleware, Status } from '../../deps/api.ts';
-import config from '../../config.ts';
+import { type Middleware, Status } from '../../shared/deps/api.ts';
+import config from '../../shared/config.ts';
 
 const HEADER_NAME = 'x-api-key';
 

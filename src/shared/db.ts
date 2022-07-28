@@ -1,18 +1,13 @@
 import config from './config.ts';
-import { SearchCriteriaPreset, TicketMonitoringRequest } from './model.ts';
-import { AsyncLogger } from './log.ts';
+import type { SearchCriteriaPreset, TicketMonitoringRequest } from './model.ts';
+import type { AsyncLogger } from './log.ts';
 import { createDb } from './db/mongodb/db.ts';
-import { createMigrator } from './db/mongodb/db.migrator.ts';
 
 export interface Db {
   getRequests(): Promise<TicketMonitoringRequest[]>;
   addRequest(request: TicketMonitoringRequest): Promise<void>;
   removeRequest(request: TicketMonitoringRequest): Promise<void>;
   getPresets(): Promise<SearchCriteriaPreset[]>;
-}
-
-export interface Migrator {
-  runMigrations(): Promise<void>;
 }
 
 export class DbError extends Error {
@@ -76,12 +71,4 @@ export function initDb(logger: AsyncLogger): Promise<Db> {
   }
 
   return db;
-}
-
-export async function initMigrator(logger: AsyncLogger): Promise<Migrator> {
-  if (config.db.type === 'mongodb') {
-    return await createMigrator(logger, config.db.connectionString, config.db.migrationsFolderPath);
-  }
-
-  throw new Error(`Unsupported DB type: ${config.db.type}`);
 }
