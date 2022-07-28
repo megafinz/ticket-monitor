@@ -1,12 +1,9 @@
 import { delay } from './deps/utils.ts';
-import { DOMParser } from './deps/html.ts';
-import { AsyncLogger } from './log.ts';
+import type { AsyncLogger } from './log.ts';
 import { initDb } from './db.ts';
-import * as search from './search.ts';
+import * as executor from './executor.ts';
 import config from './config.ts';
-import { ReportSettings } from './model.ts';
-
-const domParser = new DOMParser();
+import type { ReportSettings } from './model.ts';
 
 export async function run(
   mainLogger: AsyncLogger,
@@ -23,31 +20,25 @@ export async function run(
         for (const request of requests) {
           const requestLogger = monitoringRequestLoggerFactory(request.report);
           await requestLogger.info('--------------------------------------------');
-          await requestLogger.info(`Processing request '${request.title}'…`);
-          await requestLogger.info(`Requesting '${request.pageUrl}'…`);
-          const response = await fetch(request.pageUrl);
-          if (response.status !== 200) {
-            await requestLogger.error(`Request failed with status code ${response.status}`);
-          } else {
-            await requestLogger.info('Parsing the DOM…');
-            const html = await response.text();
-            const dom = domParser.parseFromString(html, 'text/html');
-            if (!dom) {
-              await requestLogger.error(`Can't parse the DOM`);
-            } else {
-              if (search.find(dom.body, request.searchCriteria)) {
-                await requestLogger.important(`Tickets are available for '${request.title}'! Link: ${request.pageUrl}.`);
-                await mainLogger.info(`Removing request '${request.title}' from database…`)
-                await db.removeRequest(request);
-              } else {
-                await requestLogger.info('Tickets not found');
-                if (request.expirationDate.valueOf() < Date.now()) {
-                  await requestLogger.info(`Ticket monitoring request '${request.title}' has expired`);
-                  await mainLogger.info(`Removing request '${request.title}' from database…`);
-                  await db.removeRequest(request);
-                }
-              }
-            }
+          await requestLogger.info(`Processing request '${request.title}' with URL '${request.pageUrl}'…`);
+          const result = await executor.executeRequest(request);
+          switch (result.type) {
+            case 'tickets-found':
+              await requestLogger.important(`Tickets are available for '${request.title}'! Link: ${request.pageUrl}.`);
+              await mainLogger.info(`Removing request '${request.title}' from database…`)
+              await db.removeRequest(request);
+              break;
+            case 'tickets-not-found':
+              await requestLogger.info('Tickets not found');
+              break;
+            case 'request-expired':
+              await requestLogger.info(`Ticket monitoring request '${request.title}' has expired`);
+              await mainLogger.info(`Removing request '${request.title}' from database…`);
+              await db.removeRequest(request);
+              break;
+            case 'error':
+              await mainLogger.error(result.details);
+              break;
           }
         }
       } else {

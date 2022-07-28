@@ -25,3 +25,7 @@ export interface SearchCriteriaPreset {
   title: string,
   searchCriteria: SearchCriteria
 }
+
+export type TicketMonitoringRequestDto = Omit<TicketMonitoringRequest, 'expirationDate'> & {
+  expirationDate: string
+}

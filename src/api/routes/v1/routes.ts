@@ -1,9 +1,8 @@
-import { Context, Router, Status } from '../../../deps/api.ts';
-import { parseDate } from '../../../deps/utils.ts';
-import { TicketMonitoringRequest } from '../../../model.ts';
-import { validateTicketMonitoringRequest } from '../../validation.ts';
+import { Router } from '../../../deps/api.ts';
 import { initDb } from '../../../db.ts';
+import * as executor from '../../../executor.ts';
 import * as log from '../../../log.ts';
+import validateTicketMonitoringRequestMiddleware from '../../middleware/validate-ticket-monitoring-request.ts';
 
 const routesLogger = new log.ConsoleLogger('API -> Routes');
 const router = new Router();
@@ -23,23 +22,15 @@ router.get('/ticket-monitoring-requests', async ({ response }) => {
 });
 
 // POST Monitoring Request.
-router.post('/ticket-monitoring-requests', async (ctx: Context) => {
-  const body = ctx.request.body({ type: 'json' });
-  const json = await body.value;
-  const [valid, errors] = await validateTicketMonitoringRequest(json);
-  if (!valid) {
-    ctx.response.status = Status.BadRequest;
-    ctx.response.body = errors;
-    return;
-  }
-  // TODO: add to validation: date should be in future
-  const expirationDate = parseDate(json.expirationDate, 'yyyy-MM-dd');
-  const ticketMonitoringRequest: TicketMonitoringRequest = {
-    ...json,
-    expirationDate
-  };
+router.post('/ticket-monitoring-requests', validateTicketMonitoringRequestMiddleware, async (ctx) => {
   const db = await initDb(routesLogger);
-  await db.addRequest(ticketMonitoringRequest);
+  await db.addRequest(ctx.state.payload);
+});
+
+// POST Monitoring Request -> Test.
+router.post('/ticket-monitoring-requests/test', validateTicketMonitoringRequestMiddleware, async (ctx) => {
+  const result = await executor.executeRequest(ctx.state.payload);
+  ctx.response.body = result;
 });
 
 // GET Search Criteria Presets.
