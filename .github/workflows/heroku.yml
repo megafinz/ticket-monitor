@@ -16,5 +16,5 @@ jobs:
     - run: |
         heroku container:login && \
         ./docker-build.sh && \
-        ./heroku-release.sh
+        APP_NAME=${{ secrets.HEROKU_APP_NAME}} ./heroku-release.sh
 
