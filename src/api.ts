@@ -12,8 +12,12 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 export async function run(logger: AsyncLogger) {
-  await logger.info(`API server is listening on port ${config.api.port}`);
-  await app.listen({
-    port: config.api.port
-  });
+  await logger.info(`Starting API server on port ${config.api.port}…`);
+  try {
+    await app.listen({
+      port: config.api.port
+    });
+  } catch (e) {
+    logger.error(`There was a problem starting API server: ${e}`);
+  }
 }
