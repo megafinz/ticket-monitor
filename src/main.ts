@@ -4,11 +4,13 @@ import * as api from './api.ts';
 import * as log from './log.ts';
 import { ReportSettings } from './model.ts';
 
-function createTicketMonitorRequestLogger(report: ReportSettings) {
-  return new log.CompositeLogger([
-    new log.ConsoleLogger('Worker -> Ticket Monitor'),
-    new log.TgLogger(report.chatId)
-  ]);
+function createTicketMonitorRequestLogger(report: ReportSettings | undefined) {
+  return report
+    ? new log.CompositeLogger([
+        new log.ConsoleLogger('Worker -> Ticket Monitor'),
+        new log.TgLogger(report.chatId)
+      ])
+    : new log.ConsoleLogger('Worker -> Ticket Monitor');
 }
 
 const migratorLogger = new log.ConsoleLogger('Migrator');

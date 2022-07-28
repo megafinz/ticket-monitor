@@ -7,7 +7,7 @@ import type { ReportSettings } from './model.ts';
 
 export async function run(
   mainLogger: AsyncLogger,
-  monitoringRequestLoggerFactory: (report: ReportSettings) => AsyncLogger
+  monitoringRequestLoggerFactory: (report: ReportSettings | undefined) => AsyncLogger
 ) {
   await mainLogger.info('Starting worker…');
   const db = await initDb(mainLogger);

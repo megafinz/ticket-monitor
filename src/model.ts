@@ -18,7 +18,7 @@ export interface TicketMonitoringRequest {
   pageUrl: string,
   searchCriteria: SearchCriteria,
   expirationDate: Date,
-  report: ReportSettings
+  report?: ReportSettings
 }
 
 export interface SearchCriteriaPreset {

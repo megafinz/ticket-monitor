@@ -19,7 +19,7 @@ function validateSearchCriteria(searchCriteriaJson: InputData): Rule[] {
 }
 
 function validateReport(): Rule[] {
-  return validateObject(true, {
+  return validateObject(false, {
     type: [required, isString, isIn(['telegram'])],
     chatId: [required, isString, minLength(1)]
   });
