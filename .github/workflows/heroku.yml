@@ -3,8 +3,6 @@ name: Heroku Release
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
 
@@ -15,8 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: akhileshns/heroku-deploy@v3.12.12
-    - name: Build, Push and Release a container to Heroku
       with:
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+        usedocker: true
