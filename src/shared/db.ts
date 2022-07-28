@@ -1,7 +1,8 @@
 import config from './config.ts';
 import type { SearchCriteriaPreset, TicketMonitoringRequest } from './model.ts';
-import type { AsyncLogger } from './log.ts';
-import { createDb } from './db/mongodb/db.ts';
+import type { Logger } from './log.ts';
+import { retryAsync } from './utils.ts';
+import { createDb } from './db/mongodb.ts';
 
 export interface Db {
   getRequests(): Promise<TicketMonitoringRequest[]>;
@@ -22,7 +23,7 @@ class ErrorWrappingDb implements Db {
 
   async getRequests(): Promise<TicketMonitoringRequest[]> {
     try {
-      return await this.db.getRequests();
+      return await retryAsync(async () => await this.db.getRequests());
     } catch (e) {
       throw new DbError(`${e}`);
     }
@@ -30,7 +31,7 @@ class ErrorWrappingDb implements Db {
 
   async addRequest(request: TicketMonitoringRequest): Promise<void> {
     try {
-      return await this.db.addRequest(request);
+      return await retryAsync(async () => await this.db.addRequest(request));
     } catch (e) {
       throw new DbError(`${e}`);
     }
@@ -38,7 +39,7 @@ class ErrorWrappingDb implements Db {
 
   async removeRequest(request: TicketMonitoringRequest): Promise<void> {
     try {
-      return await this.db.removeRequest(request);
+      return await retryAsync(async () => await this.db.removeRequest(request));
     } catch (e) {
       throw new DbError(`${e}`);
     }
@@ -46,7 +47,7 @@ class ErrorWrappingDb implements Db {
 
   async getPresets(): Promise<SearchCriteriaPreset[]> {
     try {
-      return await this.db.getPresets();
+      return await retryAsync(async () => await this.db.getPresets());
     } catch (e) {
       throw new DbError(`${e}`);
     }
@@ -55,7 +56,7 @@ class ErrorWrappingDb implements Db {
 
 let db: Promise<Db>;
 
-export function initDb(logger: AsyncLogger): Promise<Db> {
+export function initDb(logger: Logger): Promise<Db> {
   logger.info('Initializing database…');
 
   if (db) {

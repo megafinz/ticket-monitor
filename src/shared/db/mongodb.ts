@@ -1,8 +1,9 @@
-import { delay, formatDate, parseDate } from '../../deps/utils.ts';
-import { type Collection, type ObjectId, MongoClient, MongoDriverError } from '../../deps/db.ts';
-import { type Db, DbError } from '../../db.ts';
-import type { SearchCriteriaPreset, TicketMonitoringRequest } from '../../model.ts';
-import type { AsyncLogger } from '../../log.ts';
+import { formatDate, parseDate } from '../deps/utils.ts';
+import { type Collection, type ObjectId, MongoClient } from '../deps/db.ts';
+import { type Db, DbError } from '../db.ts';
+import type { SearchCriteriaPreset, TicketMonitoringRequest } from '../model.ts';
+import type { Logger } from '../log.ts';
+import { retryAsync } from '../utils.ts';
 
 type TicketMonitoringRequestSchema = {
   _id: ObjectId;
@@ -44,21 +45,20 @@ class MongoDb implements Db {
 
 }
 
-export async function createDb(logger: AsyncLogger, connectionString: string): Promise<Db> {
+export async function createDb(logger: Logger, connectionString: string): Promise<Db> {
   try {
-    logger.info(`Connecting to MongoDB…`);
-    const client = new MongoClient();
-    await client.connect(connectionString);
-    return new MongoDb(client);
+    return await retryAsync(async () => {
+      logger.info(`Connecting to MongoDB…`);
+      const client = new MongoClient();
+      await client.connect(connectionString);
+      return new MongoDb(client);
+    }, {
+      attempts: 20,
+      interval: 5000,
+      logger: logger
+    });
   } catch (e) {
-    if (e instanceof MongoDriverError) {
-      await logger.warn(`There was a problem connecting to MongoDB: ${e}`);
-      await logger.info('Waiting 5000ms to retry…');
-      await delay(5000);
-      return createDb(logger, connectionString);
-    } else {
-      throw new DbError(`${e}`);
-    }
+    throw new DbError(`${e}`);
   }
 }
 

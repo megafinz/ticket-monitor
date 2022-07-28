@@ -1,12 +1,12 @@
 import config from '../shared/config.ts';
-import type { AsyncLogger } from '../shared/log.ts';
-import { createMigrator } from './mongodb/migrator.ts';
+import type { Logger } from '../shared/log.ts';
+import { createMigrator } from './migrator/mongodb.ts';
 
 export interface Migrator {
   runMigrations(): Promise<void>;
 }
 
-export async function run(logger: AsyncLogger) {
+export async function run(logger: Logger) {
   let migrator: Migrator;
 
   if (config.db.type === 'mongodb') {

@@ -12,12 +12,14 @@ export interface Config {
     migrationsFolderPath: string;
   };
   retryIntervalMs: number;
-  telegram: {
-    botToken: string
-  };
   api: {
     key: string;
     port: number;
+  },
+  report?: {
+    telegram?: {
+      botToken: string
+    };
   }
 }
 
@@ -28,8 +30,10 @@ const cfg : Config = {
     migrationsFolderPath: 'migrations/mongodb'
   },
   retryIntervalMs: parseInt(Deno.env.get('RETRY_INTERVAL_MS') || '60000'),
-  telegram: {
-    botToken: Deno.env.get('TG_BOT_TOKEN') || ''
+  report: {
+    telegram: {
+      botToken: Deno.env.get('TG_BOT_TOKEN') || ''
+    }
   },
   api: {
     key: Deno.env.get('API_KEY') || '',

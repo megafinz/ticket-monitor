@@ -1,10 +1,10 @@
 import { Application, Router } from '../shared/deps/api.ts';
 import config from '../shared/config.ts';
-import type { AsyncLogger } from '../shared/log.ts';
+import type { Logger } from '../shared/log.ts';
 import auth from './middleware/auth.ts';
 import v1Router from './routes/v1/routes.ts';
 
-export async function run(logger: AsyncLogger, abortSignal: AbortSignal) {
+export async function run(logger: Logger, abortSignal: AbortSignal) {
   const app = new Application();
   const router = new Router().use('/api/v1', v1Router.routes(), v1Router.allowedMethods());
 
@@ -12,7 +12,7 @@ export async function run(logger: AsyncLogger, abortSignal: AbortSignal) {
   app.use(router.routes());
   app.use(router.allowedMethods());
 
-  await logger.info(`Starting API server on port ${config.api.port}…`);
+  logger.info(`Starting API server on port ${config.api.port}…`);
 
   try {
     await app.listen({

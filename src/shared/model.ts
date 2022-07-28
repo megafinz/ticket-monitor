@@ -8,7 +8,7 @@ export type SearchCriteria = {
   child?: SearchCriteria
 }
 
-export type ReportSettings = {
+export type ReportOptions = {
   type: 'telegram',
   chatId: string
 }
@@ -18,7 +18,7 @@ export interface TicketMonitoringRequest {
   pageUrl: string,
   searchCriteria: SearchCriteria,
   expirationDate: Date,
-  report?: ReportSettings
+  report?: ReportOptions
 }
 
 export interface SearchCriteriaPreset {

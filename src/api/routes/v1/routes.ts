@@ -9,9 +9,9 @@ const router = new Router();
 
 // Logging.
 router.use(async (ctx, next) => {
-  await routesLogger.info(`Invoking route '${ctx.request.url.pathname}'…`);
+  routesLogger.info(`Invoking route '${ctx.request.url.pathname}'…`);
   await next();
-  await routesLogger.info(`Route '${ctx.request.url.pathname}' processed with status ${ctx.response.status}`);
+  routesLogger.info(`Route '${ctx.request.url.pathname}' processed with status ${ctx.response.status}`);
 });
 
 // GET Monitoring Requests.

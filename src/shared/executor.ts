@@ -1,5 +1,6 @@
 import { type HTMLCollection, type Element, DOMParser } from './deps/html.ts';
 import type { SearchCriteria, TicketMonitoringRequest } from './model.ts';
+import { retryAsync } from './utils.ts';
 
 export type TicketMonitoringRequestResult = {
   type: 'tickets-found';
@@ -15,37 +16,39 @@ export type TicketMonitoringRequestResult = {
 const domParser = new DOMParser();
 
 export async function executeRequest(request: TicketMonitoringRequest): Promise<TicketMonitoringRequestResult> {
-  const response = await fetch(request.pageUrl);
-  if (response.status !== 200) {
-    return {
-      type: 'error',
-      details: `Request failed with status code ${response.status}`
-    }
-  } else {
-    const html = await response.text();
-    const dom = domParser.parseFromString(html, 'text/html');
-    if (!dom) {
+  return await retryAsync(async () => {
+    const response = await fetch(request.pageUrl);
+    if (response.status !== 200) {
       return {
         type: 'error',
-        details: `Can't parse the DOM`
-      }
+        details: `Request failed with status code ${response.status}`
+      };
     } else {
-      if (find(dom.body, request.searchCriteria)) {
+      const html = await response.text();
+      const dom = domParser.parseFromString(html, 'text/html');
+      if (!dom) {
         return {
-          type: 'tickets-found'
+          type: 'error',
+          details: `Can't parse the DOM`
         };
       } else {
-        if (request.expirationDate.valueOf() < Date.now()) {
+        if (find(dom.body, request.searchCriteria)) {
           return {
-            type: 'request-expired'
+            type: 'tickets-found'
+          };
+        } else {
+          if (request.expirationDate.valueOf() < Date.now()) {
+            return {
+              type: 'request-expired'
+            };
+          }
+          return {
+            type: 'tickets-not-found'
           };
         }
-        return {
-          type: 'tickets-not-found'
-        };
       }
     }
-  }
+  });
 }
 
 function find(container: Element, criteria: SearchCriteria): boolean {

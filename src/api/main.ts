@@ -10,4 +10,4 @@ Deno.addSignalListener('SIGTERM', () => {
 });
 
 await api.run(logger, abortController.signal);
-await logger.info('API server finished running');
+logger.info('API server finished running');
