@@ -1,11 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
+declare -A appsToProcesses
+appsToProcesses[migrator]=release
+appsToProcesses[api]=web
+appsToProcesses[worker]=worker
+
+if [[ -z $HEROKU_APP_NAME ]]; then
+    echo "HEROKU_APP_NAME env var must be set"
+    exit 1
+fi
+
+echo "----------- BUILD -------------"
+for app in "${!appsToProcesses[@]}"; do
+    docker build -t ticket-monitor-$app -f Dockerfile.$app .
+done
+
 echo "------------ PUSH -------------"
-docker tag ticket-monitor-migrator registry.heroku.com/$APP_NAME/release
-docker tag ticket-monitor-api registry.heroku.com/$APP_NAME/web
-docker tag ticket-monitor-worker registry.heroku.com/$APP_NAME/worker
-docker push registry.heroku.com/$APP_NAME/release
-docker push registry.heroku.com/$APP_NAME/web
-docker push registry.heroku.com/$APP_NAME/worker
+for app in "${!appsToProcesses[@]}"; do
+    docker tag ticket-monitor-$app registry.heroku.com/$HEROKU_APP_NAME/${appsToProcesses[$app]}
+done
+for release in "${appsToProcesses[@]}"; do
+    docker push registry.heroku.com/$HEROKU_APP_NAME/$release
+done
 
 echo "----------- RELEASE -----------"
-heroku container:release release web worker --app $APP_NAME
+heroku container:release "${appsToProcesses[@]}" --app $HEROKU_APP_NAME
