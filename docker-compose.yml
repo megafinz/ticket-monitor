@@ -3,16 +3,18 @@ services:
     build:
       dockerfile: Dockerfile.migrator
     environment:
+      - DB_TYPE=${DB_TYPE}
       - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
 
   api:
     depends_on:
       - migrator # TODO: wait for migrator to finish
     build:
-      dockerfile: Dockerfile.web
+      dockerfile: Dockerfile.api
     ports:
     - '${PORT}:${PORT}'
     environment:
+      - DB_TYPE=${DB_TYPE}
       - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
       - API_KEY=${API_KEY}
       - PORT=${PORT}
@@ -23,6 +25,7 @@ services:
     build:
       dockerfile: Dockerfile.worker
     environment:
+      - DB_TYPE=${DB_TYPE}
       - MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
       - RETRY_INTERVAL_MS=${RETRY_INTERVAL_MS}
       - TG_BOT_TOKEN=${TG_BOT_TOKEN}

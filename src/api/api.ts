@@ -1,8 +1,8 @@
 import { Application, Router } from '../shared/deps/api.ts';
-import config from '../shared/config.ts';
 import type { Logger } from '../shared/log.ts';
 import auth from './middleware/auth.ts';
 import v1Router from './routes/v1/routes.ts';
+import config from './config.ts';
 
 export async function run(logger: Logger, abortSignal: AbortSignal) {
   const app = new Application();

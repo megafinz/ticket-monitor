@@ -1,19 +1,21 @@
-import config from '../shared/config.ts';
 import type { Logger } from '../shared/log.ts';
 import { createMigrator } from './migrator/mongodb.ts';
+import config from './config.ts';
 
 export interface Migrator {
   runMigrations(): Promise<void>;
 }
 
 export async function run(logger: Logger) {
-  let migrator: Migrator;
+  let migrator: Migrator | undefined;
 
   if (config.db.type === 'mongodb') {
     migrator = await createMigrator(logger, config.db.connectionString, config.db.migrationsFolderPath);
-  } else {
-    throw new Error(`Unsupported DB type: ${config.db.type}`);
   }
 
-  await migrator.runMigrations();
+  if (migrator) {
+    await migrator.runMigrations();
+  } else {
+    logger.info(`No migrator defined for database type '${config.db.type}', skipping.`);
+  }
 }

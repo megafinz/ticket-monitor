@@ -2,8 +2,8 @@ import { delay } from '../shared/deps/utils.ts';
 import { initDb } from '../shared/db.ts';
 import * as executor from '../shared/executor.ts';
 import type { Logger } from '../shared/log.ts';
-import config from '../shared/config.ts';
 import * as reporter from './report.ts';
+import config from './config.ts';
 
 export async function run(logger: Logger, abortSignal: AbortSignal) {
   logger.info('Starting worker…');
@@ -52,8 +52,8 @@ export async function run(logger: Logger, abortSignal: AbortSignal) {
       logger.error(e);
     } finally {
       logger.info('--------------------------------------------');
-      logger.info(`Waiting ${config.retryIntervalMs}ms for next iteration…`);
-      await delay(config.retryIntervalMs);
+      logger.info(`Waiting ${config.worker.retryIntervalMs}ms for next iteration…`);
+      await delay(config.worker.retryIntervalMs);
     }
   }
 }

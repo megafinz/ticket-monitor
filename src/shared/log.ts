@@ -1,3 +1,5 @@
+import { ConsoleColors } from './deps/utils.ts';
+
 export interface Logger {
   info(message: string): void;
   warn(message: string): void;
@@ -12,11 +14,11 @@ export class ConsoleLogger implements Logger {
   }
 
   warn(message: string) {
-    console.warn(new Date(), `[${this.name}]`, message);
+    console.warn(new Date(), ConsoleColors.yellow(`[${this.name}]`), ConsoleColors.yellow(message));
   }
 
   error(message: string) {
-    console.error(new Date(), `[${this.name}]`, message);
+    console.error(new Date(), ConsoleColors.red(`[${this.name}]`), ConsoleColors.red(message));
   }
 
 }

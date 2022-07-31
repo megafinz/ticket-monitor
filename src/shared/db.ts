@@ -1,8 +1,9 @@
-import config from './config.ts';
+import { dbConfig } from './config.ts';
 import type { SearchCriteriaPreset, TicketMonitoringRequest } from './model.ts';
 import type { Logger } from './log.ts';
 import { retryAsync } from './utils.ts';
-import { createDb } from './db/mongodb.ts';
+import * as mongoDb from './db/mongodb.ts';
+import * as inMemoryDb from './db/in-memory.ts';
 
 export interface Db {
   getRequests(): Promise<TicketMonitoringRequest[]>;
@@ -64,11 +65,14 @@ export function initDb(logger: Logger): Promise<Db> {
     return db;
   }
 
-  if (config.db.type === 'mongodb') {
-    logger.info('Initializing MongoDB client…');
-    db = createDb(logger, config.db.connectionString).then(x => new ErrorWrappingDb(x));
+  if (dbConfig.type === 'mongodb') {
+    logger.info('Initializing MongoDB database…');
+    db = mongoDb.createDb(logger, dbConfig.connectionString).then(x => new ErrorWrappingDb(x));
+  } else if (dbConfig.type === 'in-memory') {
+    logger.info('Initializing in-memory database…');
+    db = inMemoryDb.createDb();
   } else {
-    throw new Error(`Unsupported DB type: ${config.db.type}`);
+    throw new Error(`Unsupported DB type`);
   }
 
   return db;

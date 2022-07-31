@@ -1,4 +1,4 @@
-import { Router } from '../../../shared/deps/api.ts';
+import { Status, Router } from '../../../shared/deps/api.ts';
 import { initDb } from '../../../shared/db.ts';
 import * as executor from '../../../shared/executor.ts';
 import * as log from '../../../shared/log.ts';
@@ -25,6 +25,8 @@ router.get('/ticket-monitoring-requests', async ({ response }) => {
 router.post('/ticket-monitoring-requests', validateTicketMonitoringRequestMiddleware, async (ctx) => {
   const db = await initDb(routesLogger);
   await db.addRequest(ctx.state.payload);
+  ctx.response.status = Status.Created;
+  ctx.response.body = ctx.state.payload;
 });
 
 // POST Monitoring Request -> Test.
