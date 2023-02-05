@@ -19,6 +19,7 @@ export interface ConfigValues {
   retryIntervalMs?: string;
   apiKey?: string;
   port?: string;
+  corsOrigins?: string;
   telegramBotToken?: string;
 }
 
@@ -40,6 +41,7 @@ const configValues: ConfigValues = {
   retryIntervalMs: Deno.env.get("RETRY_INTERVAL_MS"),
   apiKey: Deno.env.get("API_KEY"),
   port: Deno.env.get("PORT"),
+  corsOrigins: Deno.env.get("CORS_ORIGINS"),
   telegramBotToken: Deno.env.get("TG_BOT_TOKEN"),
 };
 

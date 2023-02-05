@@ -1,8 +1,9 @@
 export {
   Application,
+  Router,
+  Status,
   type Context,
   type Middleware,
-  Router,
   type RouterMiddleware,
-  Status,
 } from "oak";
+export { oakCors } from "oak-cors";

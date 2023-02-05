@@ -1,4 +1,4 @@
-import { Application, Router } from "../shared/deps/api.ts";
+import { Application, oakCors, Router } from "../shared/deps/api.ts";
 import type { Logger } from "../shared/log.ts";
 import config from "./config.ts";
 import auth from "./middleware/auth.ts";
@@ -12,6 +12,11 @@ export async function run(logger: Logger, abortSignal: AbortSignal) {
     v1Router.allowedMethods()
   );
 
+  app.use(
+    oakCors({
+      origin: config.api.cors?.origins || [],
+    })
+  );
   app.use(auth);
   app.use(router.routes());
   app.use(router.allowedMethods());

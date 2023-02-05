@@ -9,10 +9,12 @@ const router = new Router();
 
 // Logging.
 router.use(async (ctx, next) => {
-  routesLogger.info(`Invoking route '${ctx.request.url.pathname}'…`);
+  routesLogger.info(
+    `Invoking route ${ctx.request.method} '${ctx.request.url.pathname}'…`
+  );
   await next();
   routesLogger.info(
-    `Route '${ctx.request.url.pathname}' processed with status ${ctx.response.status}`,
+    `Route ${ctx.request.method} '${ctx.request.url.pathname}' processed with status ${ctx.response.status}`
   );
 });
 
@@ -32,7 +34,7 @@ router.post(
     await db.addRequest(ctx.state.payload);
     ctx.response.status = Status.Created;
     ctx.response.body = ctx.state.payload;
-  },
+  }
 );
 
 // POST Monitoring Request -> Test.
@@ -42,7 +44,7 @@ router.post(
   async (ctx) => {
     const result = await executor.executeRequest(ctx.state.payload);
     ctx.response.body = result;
-  },
+  }
 );
 
 // GET Search Criteria Presets.
