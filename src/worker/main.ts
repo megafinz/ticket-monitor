@@ -9,5 +9,10 @@ Deno.addSignalListener("SIGTERM", () => {
   abortController.abort();
 });
 
+Deno.addSignalListener("SIGINT", () => {
+  logger.info("Received SIGINT signal, stopping the worker…");
+  abortController.abort("Received SIGINT");
+});
+
 await worker.run(logger, abortController.signal);
 logger.info("Worker finished running");

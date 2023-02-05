@@ -61,7 +61,11 @@ export async function run(logger: Logger, abortSignal: AbortSignal) {
       logger.info(
         `Waiting ${config.worker.retryIntervalMs}ms for next iteration…`
       );
-      await delay(config.worker.retryIntervalMs);
+      try {
+        await delay(config.worker.retryIntervalMs, { signal: abortSignal });
+      } catch (_) {
+        // Ignore delay abort error here.
+      }
     }
   }
 }

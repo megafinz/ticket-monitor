@@ -9,5 +9,10 @@ Deno.addSignalListener("SIGTERM", () => {
   abortController.abort("Received SIGTERM");
 });
 
+Deno.addSignalListener("SIGINT", () => {
+  logger.info("Received SIGINT signal, stopping the API server…");
+  abortController.abort("Received SIGINT");
+});
+
 await api.run(logger, abortController.signal);
 logger.info("API server finished running");
