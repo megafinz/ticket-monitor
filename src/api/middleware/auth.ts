@@ -1,7 +1,7 @@
-import { type Middleware, Status } from '../../shared/deps/api.ts';
-import config from '../config.ts';
+import { Status, type Middleware } from "../../shared/deps/api.ts";
+import config from "../config.ts";
 
-const HEADER_NAME = 'x-api-key';
+const HEADER_NAME = "x-api-key";
 
 const authMiddleware: Middleware = async (ctx, next) => {
   const apiKey = ctx.request.headers.get(HEADER_NAME);

@@ -1,12 +1,16 @@
-import { Application, Router } from '../shared/deps/api.ts';
-import type { Logger } from '../shared/log.ts';
-import auth from './middleware/auth.ts';
-import v1Router from './routes/v1/routes.ts';
-import config from './config.ts';
+import { Application, Router } from "../shared/deps/api.ts";
+import type { Logger } from "../shared/log.ts";
+import config from "./config.ts";
+import auth from "./middleware/auth.ts";
+import v1Router from "./routes/v1/routes.ts";
 
 export async function run(logger: Logger, abortSignal: AbortSignal) {
   const app = new Application();
-  const router = new Router().use('/api/v1', v1Router.routes(), v1Router.allowedMethods());
+  const router = new Router().use(
+    "/api/v1",
+    v1Router.routes(),
+    v1Router.allowedMethods()
+  );
 
   app.use(auth);
   app.use(router.routes());
@@ -17,7 +21,7 @@ export async function run(logger: Logger, abortSignal: AbortSignal) {
   try {
     await app.listen({
       port: config.api.port,
-      signal: abortSignal
+      signal: abortSignal,
     });
   } catch (e) {
     logger.error(`There was a problem starting API server: ${e}`);

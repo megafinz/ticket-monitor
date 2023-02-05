@@ -1,5 +1,5 @@
-import { retryAsync } from '../../shared/utils.ts';
-import config from '../config.ts';
+import { retryAsync } from "../../shared/utils.ts";
+import config from "../config.ts";
 
 export class TgError extends Error {
   constructor(msg: string) {
@@ -10,20 +10,20 @@ export class TgError extends Error {
 
 export async function sendMessage(chatId: string, message: string) {
   if (!config.worker.report.telegram?.botToken) {
-    throw new TgError('Configuration is missing Telegram bot token');
+    throw new TgError("Configuration is missing Telegram bot token");
   }
   const tgUrl = `https://api.telegram.org/bot${config.worker.report.telegram.botToken}/sendMessage`;
   try {
     await retryAsync(async () => {
       await fetch(tgUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           chat_id: chatId,
-          text: message
-        })
+          text: message,
+        }),
       });
     });
   } catch (e) {

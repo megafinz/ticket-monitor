@@ -1,9 +1,9 @@
-import { config } from './deps/config.ts';
-import * as log from './log.ts';
+import { config } from "./deps/config.ts";
+import * as log from "./log.ts";
 
 config({
-  path: '.local.env',
-  export: true
+  path: ".local.env",
+  export: true,
 });
 
 class ConfigError extends Error {
@@ -22,23 +22,25 @@ export interface ConfigValues {
   telegramBotToken?: string;
 }
 
-export type DbConfig = {
-  type: 'mongodb';
-  connectionString: string;
-  migrationsFolderPath: string;
-} | {
-  type: 'in-memory'
-};
+export type DbConfig =
+  | {
+      type: "mongodb";
+      connectionString: string;
+      migrationsFolderPath: string;
+    }
+  | {
+      type: "in-memory";
+    };
 
-const logger = new log.ConsoleLogger('Configuration');
+const logger = new log.ConsoleLogger("Configuration");
 
 const configValues: ConfigValues = {
-  dbType: Deno.env.get('DB_TYPE'),
-  mongoDbConnectionString: Deno.env.get('MONGO_DB_CONNECTION_STRING'),
-  retryIntervalMs: Deno.env.get('RETRY_INTERVAL_MS'),
-  apiKey: Deno.env.get('API_KEY'),
-  port: Deno.env.get('PORT'),
-  telegramBotToken: Deno.env.get('TG_BOT_TOKEN')
+  dbType: Deno.env.get("DB_TYPE"),
+  mongoDbConnectionString: Deno.env.get("MONGO_DB_CONNECTION_STRING"),
+  retryIntervalMs: Deno.env.get("RETRY_INTERVAL_MS"),
+  apiKey: Deno.env.get("API_KEY"),
+  port: Deno.env.get("PORT"),
+  telegramBotToken: Deno.env.get("TG_BOT_TOKEN"),
 };
 
 export interface ConfigValidationResult {
@@ -62,7 +64,7 @@ export function configSection<T>(
       for (const error of validationResult.errors) {
         logger.error(error);
       }
-      throw new ConfigError('Configuration is invalid');
+      throw new ConfigError("Configuration is invalid");
     }
 
     for (const warn of validationResult.warns) {
@@ -78,13 +80,15 @@ export function configSection<T>(
 }
 
 function createDbConfig(cfg: ConfigValues): DbConfig {
-  return cfg.dbType === 'mongodb' ? {
-    type: 'mongodb',
-    connectionString: configValues.mongoDbConnectionString!,
-    migrationsFolderPath: 'migrations/mongodb'
-  } : {
-    type: 'in-memory'
-  };
+  return cfg.dbType === "mongodb"
+    ? {
+        type: "mongodb",
+        connectionString: configValues.mongoDbConnectionString!,
+        migrationsFolderPath: "migrations/mongodb",
+      }
+    : {
+        type: "in-memory",
+      };
 }
 
 function validateDbConfig(cfg: ConfigValues) {
@@ -93,18 +97,27 @@ function validateDbConfig(cfg: ConfigValues) {
   const errors: string[] = [];
 
   if (!cfg.dbType) {
-    infos.push('DB_TYPE is not set. Allowed values: \'mongodb\', \'in-memory\'. Defaulting to \'in-memory\'.');
-    cfg.dbType = 'in-memory';
-  } else if (cfg.dbType !== 'mongodb' && cfg.dbType !== 'in-memory') {
-    warns.push(`Unrecognized DB_TYPE: '${cfg.dbType}'. Allowed values: 'mongodb', 'in-memory'. Defaulting to 'in-memory'.`)
-    cfg.dbType = 'in-memory';
+    infos.push(
+      "DB_TYPE is not set. Allowed values: 'mongodb', 'in-memory'. Defaulting to 'in-memory'."
+    );
+    cfg.dbType = "in-memory";
+  } else if (cfg.dbType !== "mongodb" && cfg.dbType !== "in-memory") {
+    warns.push(
+      `Unrecognized DB_TYPE: '${cfg.dbType}'. Allowed values: 'mongodb', 'in-memory'. Defaulting to 'in-memory'.`
+    );
+    cfg.dbType = "in-memory";
   }
 
-  if (cfg.dbType === 'mongodb' && !cfg.mongoDbConnectionString) {
-    errors.push('MONGO_DB_CONECTION_STRING is required when DB_TYPE is set to \'mongodb\'');
+  if (cfg.dbType === "mongodb" && !cfg.mongoDbConnectionString) {
+    errors.push(
+      "MONGO_DB_CONECTION_STRING is required when DB_TYPE is set to 'mongodb'"
+    );
   }
 
   return { infos, warns, errors };
 }
 
-export const dbConfig: DbConfig = configSection(createDbConfig, validateDbConfig);
+export const dbConfig: DbConfig = configSection(
+  createDbConfig,
+  validateDbConfig
+);

@@ -1,4 +1,9 @@
-import { type ConfigValues, type DbConfig, configSection, dbConfig } from '../shared/config.ts';
+import {
+  configSection,
+  dbConfig,
+  type ConfigValues,
+  type DbConfig,
+} from "../shared/config.ts";
 
 export interface Config {
   db: DbConfig;
@@ -6,15 +11,15 @@ export interface Config {
     retryIntervalMs: number;
     report: {
       telegram?: {
-        botToken: string
-      }
-    }
-  }
+        botToken: string;
+      };
+    };
+  };
 }
 
 const cfg: Config = {
   db: dbConfig,
-  worker: configSection(createWorkerConfig, validateWorkerConfig)
+  worker: configSection(createWorkerConfig, validateWorkerConfig),
 };
 
 function createWorkerConfig(cfg: ConfigValues) {
@@ -23,8 +28,8 @@ function createWorkerConfig(cfg: ConfigValues) {
     report: {
       telegram: cfg.telegramBotToken
         ? { botToken: cfg.telegramBotToken }
-        : undefined
-    }
+        : undefined,
+    },
   };
 }
 
@@ -33,12 +38,12 @@ function validateWorkerConfig(cfg: ConfigValues) {
   const warns: string[] = [];
 
   if (!cfg.retryIntervalMs) {
-    infos.push('RETRY_INTERVAL_MS is not set. Defaulting to 60000.');
-    cfg.retryIntervalMs = '60000';
+    infos.push("RETRY_INTERVAL_MS is not set. Defaulting to 60000.");
+    cfg.retryIntervalMs = "60000";
   }
 
   if (!cfg.telegramBotToken) {
-    warns.push('No reporting settings are set (missing TG_BOT_TOKEN).');
+    warns.push("No reporting settings are set (missing TG_BOT_TOKEN).");
   }
 
   return { infos, warns, errors: [] };

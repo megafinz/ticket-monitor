@@ -1,0 +1,15 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-run --allow-read src/main.ts",
+    "fmt": "deno fmt"
+  },
+  "imports": {
+    "std/": "https://deno.land/std@0.176.0/",
+    "deno_dom/": "https://deno.land/x/deno_dom@v0.1.36-alpha/",
+    "oak": "https://deno.land/x/oak@v11.1.0/mod.ts",
+    "dotenv": "https://deno.land/x/dotenv@v3.2.0/mod.ts",
+    "mongo": "https://deno.land/x/mongo@v0.31.1/mod.ts",
+    "delay": "https://deno.land/x/delay@v0.2.0/mod.ts",
+    "validasaur": "https://deno.land/x/validasaur@v0.15.0/mod.ts"
+  }
+}

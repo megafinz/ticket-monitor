@@ -1,5 +1,5 @@
-import { ReportOptions } from '../shared/model.ts';
-import * as tg from './report/tg.ts';
+import { ReportOptions } from "../shared/model.ts";
+import * as tg from "./report/tg.ts";
 
 export class ReportError extends Error {
   constructor(msg: string) {
@@ -8,10 +8,13 @@ export class ReportError extends Error {
   }
 }
 
-export async function report(message: string, options: ReportOptions): Promise<void> {
+export async function report(
+  message: string,
+  options: ReportOptions
+): Promise<void> {
   try {
     switch (options.type) {
-      case 'telegram':
+      case "telegram":
         return await tg.sendMessage(options.chatId, message);
     }
   } catch (e) {

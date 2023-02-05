@@ -1,9 +1,9 @@
-import { dbConfig } from './config.ts';
-import type { SearchCriteriaPreset, TicketMonitoringRequest } from './model.ts';
-import type { Logger } from './log.ts';
-import { retryAsync } from './utils.ts';
-import * as mongoDb from './db/mongodb.ts';
-import * as inMemoryDb from './db/in-memory.ts';
+import { dbConfig } from "./config.ts";
+import * as inMemoryDb from "./db/in-memory.ts";
+import * as mongoDb from "./db/mongodb.ts";
+import type { Logger } from "./log.ts";
+import type { SearchCriteriaPreset, TicketMonitoringRequest } from "./model.ts";
+import { retryAsync } from "./utils.ts";
 
 export interface Db {
   getRequests(): Promise<TicketMonitoringRequest[]>;
@@ -20,7 +20,7 @@ export class DbError extends Error {
 }
 
 class ErrorWrappingDb implements Db {
-  constructor(private db: Db) { }
+  constructor(private db: Db) {}
 
   async getRequests(): Promise<TicketMonitoringRequest[]> {
     try {
@@ -58,18 +58,20 @@ class ErrorWrappingDb implements Db {
 let db: Promise<Db>;
 
 export function initDb(logger: Logger): Promise<Db> {
-  logger.info('Initializing database…');
+  logger.info("Initializing database…");
 
   if (db) {
-    logger.info('Database is already initialized');
+    logger.info("Database is already initialized");
     return db;
   }
 
-  if (dbConfig.type === 'mongodb') {
-    logger.info('Initializing MongoDB database…');
-    db = mongoDb.createDb(logger, dbConfig.connectionString).then(x => new ErrorWrappingDb(x));
-  } else if (dbConfig.type === 'in-memory') {
-    logger.info('Initializing in-memory database…');
+  if (dbConfig.type === "mongodb") {
+    logger.info("Initializing MongoDB database…");
+    db = mongoDb
+      .createDb(logger, dbConfig.connectionString)
+      .then((x) => new ErrorWrappingDb(x));
+  } else if (dbConfig.type === "in-memory") {
+    logger.info("Initializing in-memory database…");
     db = inMemoryDb.createDb();
   } else {
     throw new Error(`Unsupported DB type`);
